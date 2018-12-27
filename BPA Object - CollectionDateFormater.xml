@@ -1,0 +1,252 @@
+﻿<process name="CollectionDateFormater" version="1.0" bpversion="5.0.10.0" narrative="" type="object" runmode="Exclusive" preferredid="266e6302-9c8b-4426-ab40-17706fe8fdd4">
+  <appdef>
+    <element name="Application Root">
+      <id>e3f286a4-5f94-4e09-a000-257a0eccc4e1</id>
+      <type>Application</type>
+      <datatype>unknown</datatype>
+      <diagnose>False</diagnose>
+    </element>
+  </appdef>
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <subsheet subsheetid="4b5364d9-ceb1-4da8-9c5e-7c7e51325ea7" type="CleanUp" published="True">
+    <name>Clean Up</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="7ed743ee-0bbe-4db4-84f3-006d8bbab640" type="Normal" published="False">
+    <name>DateFormater</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="faee82cd-4833-4adf-b5e9-ce659094a9f4" name="Start" type="Start">
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <onsuccess>06e54682-b8bf-4f58-9f4e-f73ceb978cd8</onsuccess>
+  </stage>
+  <stage stageid="06e54682-b8bf-4f58-9f4e-f73ceb978cd8" name="End" type="End">
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="627898ab-34d5-4714-831f-7cbde3d51004" name="Stage1" type="ProcessInfo">
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <references>
+      <reference>System.Data.dll</reference>
+      <reference>System.Xml.dll</reference>
+      <reference>System.Drawing.dll</reference>
+      <reference>System.dll</reference>
+    </references>
+    <imports>
+      <import>System</import>
+      <import>System.Drawing</import>
+      <import>System.Data</import>
+    </imports>
+    <language>csharp</language>
+    <globalcode><![CDATA[]]></globalcode>
+    <code><![CDATA[]]></code>
+  </stage>
+  <stage stageid="af10a055-8bfa-43fc-8881-49bf241a744f" name="Clean Up" type="SubSheetInfo">
+    <subsheetid>4b5364d9-ceb1-4da8-9c5e-7c7e51325ea7</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="2b594b5b-b5f3-4a28-aaca-4fc4c1651080" name="Start" type="Start">
+    <subsheetid>4b5364d9-ceb1-4da8-9c5e-7c7e51325ea7</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <onsuccess>a05c1e05-07de-4062-bad0-39e27def639f</onsuccess>
+  </stage>
+  <stage stageid="a05c1e05-07de-4062-bad0-39e27def639f" name="End" type="End">
+    <subsheetid>4b5364d9-ceb1-4da8-9c5e-7c7e51325ea7</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="d1811ae2-b5d8-4fef-a0da-4ec5c2000a92" name="DateFormater" type="SubSheetInfo">
+    <subsheetid>7ed743ee-0bbe-4db4-84f3-006d8bbab640</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="13ed11de-d707-4b7f-ad48-0d96143c7c31" name="Start" type="Start">
+    <subsheetid>7ed743ee-0bbe-4db4-84f3-006d8bbab640</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="collection" name="inData" narrative="Input Data Collection" stage="inData" />
+      <input type="text" name="dateFormat" narrative="Define the date format like &quot;dd/MM/yyyy&quot; etc." stage="dateFormat" />
+    </inputs>
+    <onsuccess>c3c3420b-29eb-442a-84b9-4c245bda14a1</onsuccess>
+  </stage>
+  <stage stageid="2ea38220-040d-40f0-90f5-ca0bec2bd958" name="End" type="End">
+    <subsheetid>7ed743ee-0bbe-4db4-84f3-006d8bbab640</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="collection" name="outData" narrative="Modified Collection" stage="outData" />
+    </outputs>
+  </stage>
+  <stage stageid="36d00fa1-21d9-41d9-8aa1-ba9520542dcf" name="Note1" type="Note">
+    <subsheetid>4b5364d9-ceb1-4da8-9c5e-7c7e51325ea7</subsheetid>
+    <narrative>Clean Up Page
+
+This is an optional page where you might choose to perform some finalisation (or "cleanup") tasks as your business object is closed down.
+
+The cleanup action will be called automatically immediately after closing your business object at the end of a business process.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than before the disposal of the business object.</narrative>
+    <displayx>-180</displayx>
+    <displayy>60</displayy>
+    <displaywidth>180</displaywidth>
+    <displayheight>230</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="09d39c5e-cb2b-449c-a9e7-2a80e0d693aa" name="Note2" type="Note">
+    <narrative>Initialise Page
+
+This is an optional page where you might choose to perform some initialisation tasks after your business object is loaded.
+
+The initialise action will be called automatically immediately after loading your business object.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than after the creation of the object.</narrative>
+    <displayx>-180</displayx>
+    <displayy>60</displayy>
+    <displaywidth>180</displaywidth>
+    <displayheight>230</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="c3c3420b-29eb-442a-84b9-4c245bda14a1" name="FormatDate" type="Code">
+    <subsheetid>7ed743ee-0bbe-4db4-84f3-006d8bbab640</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="collection" name="inData" expr="[inData]" />
+      <input type="text" name="dateFormat" expr="[dateFormat]" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="outData" stage="outData" />
+    </outputs>
+    <onsuccess>2ea38220-040d-40f0-90f5-ca0bec2bd958</onsuccess>
+    <code><![CDATA[//outData = inData.Clone();
+outData = new DataTable();
+foreach (DataRow item in inData.Rows)
+{
+	foreach (DataColumn column in inData.Columns)
+	{
+		DateTime date = DateTime.Now;
+        if (DateTime.TryParse(item[column].ToString(), out date))
+        {
+             item[column] = date.ToString(dateFormat);
+        }
+    }
+	outData.Rows.Add(item.ItemArray);
+}]]></code>
+  </stage>
+  <stage stageid="a9572ac1-96af-4e54-9e3e-a591a936372f" name="inData" type="Collection">
+    <subsheetid>7ed743ee-0bbe-4db4-84f3-006d8bbab640</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>165</displayx>
+    <displayy>-210</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="c9ecca36-aef9-409b-8c05-172b3594a69c" name="dateFormat" type="Data">
+    <subsheetid>7ed743ee-0bbe-4db4-84f3-006d8bbab640</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>165</displayx>
+    <displayy>-150</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="7e388480-5b19-4b36-8921-6934085f8d7c" name="outData" type="Collection">
+    <subsheetid>7ed743ee-0bbe-4db4-84f3-006d8bbab640</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>165</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+</process>
