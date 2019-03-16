@@ -6,8 +6,9 @@ Reusable Components for BluePrism
   
 * BPA Object - AzureStorageUtility.xml
   VBO responsible for doing operations on Azure Blob Storage.
+  
     Contains 4 actions
-     ** ListBlobItems
-     ** DownloadBlobItem
-     ** UploadBlobItem
-     ** DeleteBlobItem
+     * ListBlobItems
+     * DownloadBlobItem
+     * UploadBlobItem
+     * DeleteBlobItem
