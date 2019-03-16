@@ -1,0 +1,953 @@
+﻿<process name="AzureStorageUtility" version="1.0" bpversion="5.0.10.0" narrative="" type="object" runmode="Exclusive" preferredid="b2776168-2d65-4a34-a02d-eff044cb0409">
+  <appdef>
+    <element name="Application Root">
+      <id>800f327e-9135-4be9-a5aa-78b86e9404a9</id>
+      <type>Application</type>
+      <basetype>Application</basetype>
+      <datatype>unknown</datatype>
+      <diagnose>False</diagnose>
+    </element>
+  </appdef>
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <subsheet subsheetid="d505da7a-55ac-48c5-ab51-6b425538a66e" type="CleanUp" published="True">
+    <name>Clean Up</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="c154ce20-f6ef-4664-98ce-457a74992357" type="Normal" published="True">
+    <name>ListBlobItems</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="b6fa9943-cf57-4c7b-9edc-964a7fbd7a37" type="Normal" published="True">
+    <name>DownloadBlobItem</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="e3a4a794-cb24-4b45-9d53-ee774394b86e" type="Normal" published="True">
+    <name>UploadBlobItem</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="0395123c-d5d2-49e6-b816-96ca0f95a0c9" type="Normal" published="True">
+    <name>DeleteBlobItem</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="00f249e4-c89b-4014-aa3a-5e66e44696b5" name="Start" type="Start">
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <onsuccess>56bcd2f8-006e-4691-bb51-2d1851204450</onsuccess>
+  </stage>
+  <stage stageid="56bcd2f8-006e-4691-bb51-2d1851204450" name="End" type="End">
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="2a2324c2-347a-4d0d-8a1e-c50f838c8001" name="Stage1" type="ProcessInfo">
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <references>
+      <reference>System.Data.dll</reference>
+      <reference>System.Xml.dll</reference>
+      <reference>System.Drawing.dll</reference>
+      <reference>System.Net.Http.dll</reference>
+      <reference>System.Xml.Linq.dll</reference>
+      <reference>System.dll</reference>
+      <reference>System.IO.dll</reference>
+      <reference>System.Web.dll</reference>
+      <reference>System.Data.DataSetExtensions.dll</reference>
+      <reference>System.Core.dll</reference>
+    </references>
+    <imports>
+      <import>System</import>
+      <import>System.Drawing</import>
+      <import>System.Globalization</import>
+      <import>System.IO</import>
+      <import>System.Net</import>
+      <import>System.Net.Http</import>
+      <import>System.Xml.Linq</import>
+      <import>System.Net.Http.Headers</import>
+      <import>System.Security.Cryptography</import>
+      <import>System.Text</import>
+      <import>System.Web</import>
+      <import>System.Collections.Specialized</import>
+      <import>System.Linq</import>
+      <import>System.Data</import>
+    </imports>
+    <language>csharp</language>
+    <globalcode><![CDATA[]]></globalcode>
+    <code><![CDATA[/// <summary>
+        /// This creates the authorization header. This is required, and must be built 
+        ///   exactly following the instructions. This will return the authorization header
+        ///   for most storage service calls.
+        /// Create a string of the message signature and then encrypt it.
+        /// </summary>
+        /// <param name="storageAccountName">The name of the storage account to use.</param>
+        /// <param name="storageAccountKey">The access key for the storage account to be used.</param>
+        /// <param name="now">Date/Time stamp for now.</param>
+        /// <param name="httpRequestMessage">The HttpWebRequest that needs an auth header.</param>
+        /// <param name="ifMatch">Provide an eTag, and it will only make changes
+        /// to a blob if the current eTag matches, to ensure you don't overwrite someone else's changes.</param>
+        /// <param name="md5">Provide the md5 and it will check and make sure it matches the blob's md5.
+        /// If it doesn't match, it won't return a value.</param>
+        /// <returns></returns>
+        internal static AuthenticationHeaderValue GetAuthorizationHeader(
+           string storageAccountName, string storageAccountKey, DateTime now,
+           HttpRequestMessage httpRequestMessage, string ifMatch = "", string md5 = "")
+        {
+            // This is the raw representation of the message signature.
+            HttpMethod method = httpRequestMessage.Method;
+            String MessageSignature = String.Format("{0}\n\n\n{1}\n{5}\n\n\n\n{2}\n\n\n\n{3}{4}",
+                      method.ToString(),
+                      (method == HttpMethod.Get || method == HttpMethod.Head || method == HttpMethod.Delete) ? String.Empty
+                        : httpRequestMessage.Content.Headers.ContentLength.ToString(),
+                      ifMatch,
+                      GetCanonicalizedHeaders(httpRequestMessage),
+                      GetCanonicalizedResource(httpRequestMessage.RequestUri, storageAccountName),
+                      md5);
+
+            // Now turn it into a byte array.
+            byte[] SignatureBytes = Encoding.UTF8.GetBytes(MessageSignature);
+
+            // Create the HMACSHA256 version of the storage key.
+            HMACSHA256 SHA256 = new HMACSHA256(Convert.FromBase64String(storageAccountKey));
+
+            // Compute the hash of the SignatureBytes and convert it to a base64 string.
+            string signature = Convert.ToBase64String(SHA256.ComputeHash(SignatureBytes));
+
+            // This is the actual header that will be added to the list of request headers.
+            // You can stop the code here and look at the value of 'authHV' before it is returned.
+            AuthenticationHeaderValue authHV = new AuthenticationHeaderValue("SharedKey",
+                storageAccountName + ":" + Convert.ToBase64String(SHA256.ComputeHash(SignatureBytes)));
+            return authHV;
+        }
+
+        /// <summary>
+        /// Put the headers that start with x-ms in a list and sort them.
+        /// Then format them into a string of [key:value\n] values concatenated into one string.
+        /// (Canonicalized Headers = headers where the format is standardized).
+        /// </summary>
+        /// <param name="httpRequestMessage">The request that will be made to the storage service.</param>
+        /// <returns>Error message; blank if okay.</returns>
+        private static string GetCanonicalizedHeaders(HttpRequestMessage httpRequestMessage)
+        {
+            var headers = from kvp in httpRequestMessage.Headers
+                          where kvp.Key.StartsWith("x-ms-", StringComparison.OrdinalIgnoreCase)
+                          orderby kvp.Key
+                          select new { Key = kvp.Key.ToLowerInvariant(), kvp.Value };
+
+            StringBuilder sb = new StringBuilder();
+
+            // Create the string in the right format; this is what makes the headers "canonicalized" --
+            //   it means put in a standard format. http://en.wikipedia.org/wiki/Canonicalization
+            foreach (var kvp in headers)
+            {
+                StringBuilder headerBuilder = new StringBuilder(kvp.Key);
+                char separator = ':';
+
+                // Get the value for each header, strip out \r\n if found, then append it with the key.
+                foreach (string headerValues in kvp.Value)
+                {
+                    string trimmedValue = headerValues.TrimStart().Replace("\r\n", String.Empty);
+                    headerBuilder.Append(separator).Append(trimmedValue);
+
+                    // Set this to a comma; this will only be used 
+                    //   if there are multiple values for one of the headers.
+                    separator = ',';
+                }
+                sb.Append(headerBuilder.ToString()).Append("\n");
+            }
+            return sb.ToString();
+        }      
+
+        /// <summary>
+        /// This part of the signature string represents the storage account 
+        ///   targeted by the request. Will also include any additional query parameters/values.
+        /// For ListContainers, this will return something like this:
+        ///   /storageaccountname/\ncomp:list
+        /// </summary>
+        /// <param name="address">The URI of the storage service.</param>
+        /// <param name="accountName">The storage account name.</param>
+        /// <returns>String representing the canonicalized resource.</returns>
+        private static string GetCanonicalizedResource(Uri address, string storageAccountName)
+        {
+            // The absolute path is "/" because for we're getting a list of containers.
+            StringBuilder sb = new StringBuilder("/").Append(storageAccountName).Append(address.AbsolutePath);
+
+            // Address.Query is the resource, such as "?comp=list".
+            // This ends up with a NameValueCollection with 1 entry having key=comp, value=list.
+            // It will have more entries if you have more query parameters.
+            NameValueCollection values = HttpUtility.ParseQueryString(address.Query);
+
+            foreach (var item in values.AllKeys.OrderBy(k => k))
+            {
+                sb.Append('\n').Append(item).Append(':').Append(values[item]);
+            }
+
+            return sb.ToString();
+
+        }]]></code>
+  </stage>
+  <stage stageid="afcad9bb-074d-4641-99b4-51c9f4327d7d" name="Clean Up" type="SubSheetInfo">
+    <subsheetid>d505da7a-55ac-48c5-ab51-6b425538a66e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="78308965-b554-45fa-ae53-479bee7f6821" name="Start" type="Start">
+    <subsheetid>d505da7a-55ac-48c5-ab51-6b425538a66e</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <onsuccess>ee2564c0-1482-4b29-881d-8dbd3fc0525f</onsuccess>
+  </stage>
+  <stage stageid="ee2564c0-1482-4b29-881d-8dbd3fc0525f" name="End" type="End">
+    <subsheetid>d505da7a-55ac-48c5-ab51-6b425538a66e</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="d49e7632-d373-492b-876c-c78d8f06839c" name="ListBlobItems" type="SubSheetInfo">
+    <subsheetid>c154ce20-f6ef-4664-98ce-457a74992357</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="28ae3678-ad57-4cc2-b529-98fe7575eafd" name="Start" type="Start">
+    <subsheetid>c154ce20-f6ef-4664-98ce-457a74992357</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-135</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="storageAccountName" narrative="Azure Storage Account Name" stage="storageAccountName" />
+      <input type="text" name="storageAccountKey" narrative="Azure Storage Account Secret Key. Can be collected from Azure Portal." stage="storageAccountKey" />
+      <input type="text" name="containerName" narrative="Azure Storage Blob Container Name" stage="containerName" />
+    </inputs>
+    <onsuccess>3b829e8b-491e-4304-ba15-b06a1573444c</onsuccess>
+  </stage>
+  <stage stageid="4df8c947-740e-45db-88ff-ba272ffc1a1e" name="End" type="End">
+    <subsheetid>c154ce20-f6ef-4664-98ce-457a74992357</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="collection" name="blobItemsList" narrative="Blob Items List From Given Container" stage="blobItemsList" />
+    </outputs>
+  </stage>
+  <stage stageid="130ee520-7cb3-4d5c-bdce-c1be881b884c" name="Note1" type="Note">
+    <subsheetid>d505da7a-55ac-48c5-ab51-6b425538a66e</subsheetid>
+    <narrative>Clean Up Page
+
+This is an optional page where you might choose to perform some finalisation (or "cleanup") tasks as your business object is closed down.
+
+The cleanup action will be called automatically immediately after closing your business object at the end of a business process.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than before the disposal of the business object.</narrative>
+    <displayx>-180</displayx>
+    <displayy>60</displayy>
+    <displaywidth>180</displaywidth>
+    <displayheight>230</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="0b0b53ce-aed9-4ef5-a9fa-25715c642245" name="Note2" type="Note">
+    <narrative>Initialise Page
+
+This is an optional page where you might choose to perform some initialisation tasks after your business object is loaded.
+
+The initialise action will be called automatically immediately after loading your business object.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than after the creation of the object.</narrative>
+    <displayx>-180</displayx>
+    <displayy>60</displayy>
+    <displaywidth>180</displaywidth>
+    <displayheight>230</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="3b829e8b-491e-4304-ba15-b06a1573444c" name="ListBlobItemsCode" type="Code">
+    <subsheetid>c154ce20-f6ef-4664-98ce-457a74992357</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-30</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="storageAccountName" expr="[storageAccountName]" />
+      <input type="text" name="storageAccountKey" expr="[storageAccountKey]" />
+      <input type="text" name="containerName" expr="[containerName]" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="blobItems" stage="blobItemsList" />
+    </outputs>
+    <onsuccess>4df8c947-740e-45db-88ff-ba272ffc1a1e</onsuccess>
+    <code><![CDATA[// Initialize Collection with one column
+blobItems = new DataTable();
+blobItems.Columns.Add("Name");
+
+// Construct the URI. This will look like this:
+//   https://myaccount.blob.core.windows.net/resource
+String uri = string.Format("http://{0}.blob.core.windows.net/{1}?restype=container&comp=list", storageAccountName,containerName);
+
+// Set this to whatever payload you desire. Ours is null because 
+//   we're not passing anything in.
+Byte[] requestPayload = null;
+
+//Instantiate the request message with a null payload.
+using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri)
+{ Content = (requestPayload == null) ? null : new ByteArrayContent(requestPayload) })
+{
+
+    // Add the request headers for x-ms-date and x-ms-version.
+    DateTime now = DateTime.UtcNow;
+    httpRequestMessage.Headers.Add("x-ms-date", now.ToString("R", CultureInfo.InvariantCulture));
+    httpRequestMessage.Headers.Add("x-ms-version", "2017-04-17");
+    // If you need any additional headers, add them here before creating
+    //   the authorization header. 
+
+	
+    // Add the authorization header.
+    httpRequestMessage.Headers.Authorization = GetAuthorizationHeader(
+       storageAccountName, storageAccountKey, now, httpRequestMessage);
+
+	   //urlInfo = httpRequestMessage.Headers.ToString();
+	   
+    // Send the request.
+    using (HttpResponseMessage httpResponseMessage = new HttpClient().SendAsync(httpRequestMessage).Result)
+    {
+		// If successful (status code = 200), 
+        //   parse the XML response for the container names.
+        if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+        {
+            String xmlString = httpResponseMessage.Content.ReadAsStringAsync().Result;
+            XElement x = XElement.Parse(xmlString);
+            foreach (XElement container in x.Element("Blobs").Elements("Blob"))
+            {
+				DataRow dataRow = blobItems.NewRow();
+				dataRow["Name"] = container.Element("Name").Value;
+				blobItems.Rows.Add(dataRow);
+            }
+        }
+    }
+}]]></code>
+  </stage>
+  <stage stageid="25b6af9b-28bc-456e-b0b8-480195c1a913" name="storageAccountName" type="Data">
+    <subsheetid>c154ce20-f6ef-4664-98ce-457a74992357</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-180</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="7c64c7fc-8eb6-4cad-9bb4-b9f7a9cad4c7" name="storageAccountKey" type="Data">
+    <subsheetid>c154ce20-f6ef-4664-98ce-457a74992357</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-120</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="3b8b545c-5343-41b3-a763-3187070f9151" name="containerName" type="Data">
+    <subsheetid>c154ce20-f6ef-4664-98ce-457a74992357</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-240</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="56cf5b46-6911-437e-b80c-b04463f84505" name="blobItemsList" type="Collection">
+    <subsheetid>c154ce20-f6ef-4664-98ce-457a74992357</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>135</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="ddc4e22a-cac5-4a63-a940-a1b11741251e" name="DownloadBlobItem" type="SubSheetInfo">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="994664e7-665f-4b60-81a5-e9e57db889fa" name="Start" type="Start">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-135</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="storageAccountName" narrative="Azure Storage Account Name" stage="storageAccountName" />
+      <input type="text" name="storageAccountKey" narrative="Azure Storage Account Secret Key. Can be collected from Azure Portal." stage="storageAccountKey" />
+      <input type="text" name="containerName" narrative="Azure Storage Blob Container Name" stage="containerName" />
+      <input type="text" name="blobName" narrative="Blob Name to be downloaded" stage="blobName" />
+      <input type="text" name="filePath" narrative="Local or Shared path to download blob file" stage="filePath" />
+    </inputs>
+    <onsuccess>a1d8a4de-739c-4143-ad1a-1408ad48c8ba</onsuccess>
+  </stage>
+  <stage stageid="68715e8d-c413-4e53-b4a4-f42b39527dcf" name="End" type="End">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="a1d8a4de-739c-4143-ad1a-1408ad48c8ba" name="DownloadBlob" type="Code">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-30</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="storageAccountName" expr="[storageAccountName]" />
+      <input type="text" name="storageAccountKey" expr="[storageAccountKey]" />
+      <input type="text" name="containerName" expr="[containerName]" />
+      <input type="text" name="blobName" expr="[blobName]" />
+      <input type="text" name="filePath" expr="[filePath]" />
+    </inputs>
+    <onsuccess>68715e8d-c413-4e53-b4a4-f42b39527dcf</onsuccess>
+    <code><![CDATA[// Construct the URI. This will look like this:
+//  https://myaccount.blob.core.windows.net/mycontainer/myblob
+String uri = string.Format("http://{0}.blob.core.windows.net/{1}/{2}", storageAccountName, containerName, blobName);
+
+// Set this to whatever payload you desire. Ours is null because 
+//   we're not passing anything in.
+Byte[] requestPayload = null;
+
+//Instantiate the request message with a null payload.
+using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri)
+{ Content = (requestPayload == null) ? null : new ByteArrayContent(requestPayload) })
+{
+    // Add the request headers for x-ms-date and x-ms-version.
+    DateTime now = DateTime.UtcNow;
+    httpRequestMessage.Headers.Add("x-ms-date", now.ToString("R", CultureInfo.InvariantCulture));
+    httpRequestMessage.Headers.Add("x-ms-version", "2017-04-17");
+    // If you need any additional headers, add them here before creating
+    //   the authorization header. 
+
+    // Add the authorization header.
+    httpRequestMessage.Headers.Authorization = GetAuthorizationHeader(storageAccountName, storageAccountKey, now, httpRequestMessage);
+
+    // Send the request.
+    using (HttpResponseMessage httpResponseMessage = new HttpClient().SendAsync(httpRequestMessage).Result)
+    {
+		// If successful (status code = 200), 
+        //   parse the XML response for the container names.
+        if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+        {
+            var content = httpResponseMessage.Content.ReadAsByteArrayAsync().Result;
+            File.WriteAllBytes(Path.Combine(filePath, blobName), content);
+        }
+    }
+}]]></code>
+  </stage>
+  <stage stageid="3088c858-584e-4a67-a773-567a11a501b1" name="storageAccountName" type="Data">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-180</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="d4f092a5-2ff1-4d92-9901-1e48207f3d2e" name="storageAccountKey" type="Data">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-120</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="3b44e160-1ee3-4bbc-834a-2c66ad4ff3e4" name="containerName" type="Data">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-240</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="875f6620-b94c-4bf7-ba59-2974737755ca" name="blobName" type="Data">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>375</displayx>
+    <displayy>-240</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="837d0e95-cde1-4f28-b176-a09516e495db" name="filePath" type="Data">
+    <subsheetid>b6fa9943-cf57-4c7b-9edc-964a7fbd7a37</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>375</displayx>
+    <displayy>-180</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="18dbfdd9-c27d-4d7d-b853-457209d5478c" name="UploadBlobItem" type="SubSheetInfo">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="c2a0c7f5-af31-4fe3-bc8e-7698f176e22b" name="Start" type="Start">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-135</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="storageAccountName" narrative="Azure Storage Account Name" stage="storageAccountName" />
+      <input type="text" name="storageAccountKey" narrative="Azure Storage Account Secret Key. Can be collected from Azure Portal." stage="storageAccountKey" />
+      <input type="text" name="containerName" narrative="Azure Storage Blob Container Name" stage="containerName" />
+      <input type="text" name="blobName" narrative="Blob Name to be downloaded" stage="blobName" />
+      <input type="text" name="filePath" narrative="Local or Shared path to download blob file" stage="filePath" />
+    </inputs>
+    <onsuccess>8bd56809-11ea-408f-90c3-f29dfd9b71a8</onsuccess>
+  </stage>
+  <stage stageid="da9bbb5b-4a2a-4716-b3b6-654fec7f2da3" name="End" type="End">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="8bd56809-11ea-408f-90c3-f29dfd9b71a8" name="UploadBlob" type="Code">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-30</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="storageAccountName" expr="[storageAccountName]" />
+      <input type="text" name="storageAccountKey" expr="[storageAccountKey]" />
+      <input type="text" name="containerName" expr="[containerName]" />
+      <input type="text" name="blobName" expr="[blobName]" />
+      <input type="text" name="filePath" expr="[filePath]" />
+    </inputs>
+    <onsuccess>da9bbb5b-4a2a-4716-b3b6-654fec7f2da3</onsuccess>
+    <code><![CDATA[// Construct the URI. This will look like this:
+//  https://myaccount.blob.core.windows.net/mycontainer/myblob
+String uri = string.Format("http://{0}.blob.core.windows.net/{1}/{2}", storageAccountName, containerName, blobName);
+
+Byte[] requestPayload = File.ReadAllBytes(filePath);
+
+using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Put, uri)
+{ Content = (requestPayload == null) ? null : new ByteArrayContent(requestPayload) })
+{
+
+    // Add the request headers for x-ms-date and x-ms-version.
+    DateTime now = DateTime.UtcNow;
+    httpRequestMessage.Headers.Add("x-ms-date", now.ToString("R", CultureInfo.InvariantCulture));
+    httpRequestMessage.Headers.Add("x-ms-version", "2017-04-17");
+    httpRequestMessage.Headers.Add("x-ms-blob-type", "BlockBlob");
+
+    // If you need any additional headers, add them here before creating
+    //   the authorization header. 
+
+    // Add the authorization header.
+    httpRequestMessage.Headers.Authorization = GetAuthorizationHeader(storageAccountName, storageAccountKey, now, httpRequestMessage);
+
+    // Send the request.
+    using (HttpResponseMessage httpResponseMessage = new HttpClient().SendAsync(httpRequestMessage).Result)
+    {
+        // If successful (status code = 200), 
+        //   parse the XML response for the container names.
+        if (httpResponseMessage.StatusCode == HttpStatusCode.Created)
+        {
+            var content = httpResponseMessage.Content.ReadAsStringAsync().Result;
+            //Console.WriteLine(content);
+        }
+    }
+}]]></code>
+  </stage>
+  <stage stageid="b52034fe-a42e-40b2-bf8a-c8d2649b061e" name="storageAccountName" type="Data">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-180</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="101e2bd5-bb01-4011-890a-9b9a8c9bbaed" name="storageAccountKey" type="Data">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-120</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="6115daec-b90c-4221-b9a3-4b2184040a59" name="containerName" type="Data">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-240</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="e1f92af1-3757-4109-86ac-dd6be38a0f57" name="blobName" type="Data">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>375</displayx>
+    <displayy>-240</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="32cd647c-93a7-4c53-948a-696a22b21b86" name="filePath" type="Data">
+    <subsheetid>e3a4a794-cb24-4b45-9d53-ee774394b86e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>375</displayx>
+    <displayy>-180</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="9bb78eb5-4b09-49ab-8d23-37e7e4b78b4a" name="DeleteBlobItem" type="SubSheetInfo">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="3898993b-f5f4-4312-895b-f532cb1baff2" name="Start" type="Start">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-135</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="storageAccountName" narrative="Azure Storage Account Name" stage="storageAccountName" />
+      <input type="text" name="storageAccountKey" narrative="Azure Storage Account Secret Key. Can be collected from Azure Portal." stage="storageAccountKey" />
+      <input type="text" name="containerName" narrative="Azure Storage Blob Container Name" stage="containerName" />
+      <input type="text" name="blobName" narrative="Blob Name to be downloaded" stage="blobName" />
+    </inputs>
+    <onsuccess>2ba879c1-df3a-48e2-898e-80415777f667</onsuccess>
+  </stage>
+  <stage stageid="e8778bb6-9090-4ba8-8986-10cea537c983" name="End" type="End">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="text" name="resultMessage" narrative="Result Message of Delete action" stage="resultMessage" />
+    </outputs>
+  </stage>
+  <stage stageid="2ba879c1-df3a-48e2-898e-80415777f667" name="DeleteBlob" type="Code">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-30</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="storageAccountName" expr="[storageAccountName]" />
+      <input type="text" name="storageAccountKey" expr="[storageAccountKey]" />
+      <input type="text" name="containerName" expr="[containerName]" />
+      <input type="text" name="blobName" expr="[blobName]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="resultMessage" stage="resultMessage" />
+    </outputs>
+    <onsuccess>e8778bb6-9090-4ba8-8986-10cea537c983</onsuccess>
+    <code><![CDATA[// Construct the URI. This will look like this:
+//  https://myaccount.blob.core.windows.net/mycontainer/myblob
+String uri = string.Format("http://{0}.blob.core.windows.net/{1}/{2}", storageAccountName, containerName, blobName);
+
+// Set this to whatever payload you desire. Ours is null because 
+//   we're not passing anything in.
+Byte[] requestPayload = null;
+
+//Instantiate the request message with a null payload.
+using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Delete, uri)
+{ Content = (requestPayload == null) ? null : new ByteArrayContent(requestPayload) })
+{
+
+    // Add the request headers for x-ms-date and x-ms-version.
+    DateTime now = DateTime.UtcNow;
+    httpRequestMessage.Headers.Add("x-ms-date", now.ToString("R", CultureInfo.InvariantCulture));
+    httpRequestMessage.Headers.Add("x-ms-version", "2017-04-17");
+    // If you need any additional headers, add them here before creating
+    //   the authorization header. 
+
+    // Add the authorization header.
+    httpRequestMessage.Headers.Authorization = GetAuthorizationHeader(storageAccountName, storageAccountKey, now, httpRequestMessage);
+
+    // Send the request.
+    using (HttpResponseMessage httpResponseMessage = new HttpClient().SendAsync(httpRequestMessage).Result)
+    {
+        // If successful (status code = 200), 
+        //   parse the XML response for the container names.
+        if (httpResponseMessage.StatusCode == HttpStatusCode.Accepted)
+        {
+            resultMessage = "All Good. Blob Deleted..";
+        }
+		else
+		{
+			resultMessage = "Something went wrong..";
+		}
+    }
+}]]></code>
+  </stage>
+  <stage stageid="5f4e7817-3d3f-48f4-b7c8-49ede58531d6" name="storageAccountName" type="Data">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-180</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="95a08813-0431-4524-b00e-71949a14e50b" name="storageAccountKey" type="Data">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-120</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="68e601ae-e394-429f-acfa-2f484db8ee5e" name="containerName" type="Data">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>-240</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="80e3d311-0c50-4bca-a120-01607721268c" name="blobName" type="Data">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>375</displayx>
+    <displayy>-240</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="d95bf542-96dd-447b-be57-ce8462c77069" name="resultMessage" type="Data">
+    <subsheetid>0395123c-d5d2-49e6-b816-96ca0f95a0c9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>270</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+</process>
