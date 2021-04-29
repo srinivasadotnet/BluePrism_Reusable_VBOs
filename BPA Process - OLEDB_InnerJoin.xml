@@ -1,0 +1,61 @@
+﻿<process name="OLEDB_InnerJoin" version="1.0" bpversion="6.7.3.27155" narrative="" byrefcollection="true" preferredid="4d251485-1e8b-41b3-8c37-47c075b6a883">
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <stage stageid="e59f1701-11b2-40ff-8f46-1d0b2fd38a74" name="Start" type="Start">
+    <display x="15" y="-210" />
+    <onsuccess>85702cd1-28dc-4da2-8439-e5c7406fb2cf</onsuccess>
+  </stage>
+  <stage stageid="b3fe9e74-ee66-42b8-88b3-3bc2de265f8d" name="End" type="End">
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="ade7a5ce-cd59-44c5-892c-32d05ef8b306" name="Stage1" type="ProcessInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="85702cd1-28dc-4da2-8439-e5c7406fb2cf" name="Data - OLEDB::Set Connection" type="Action">
+    <loginhibit onsuccess="true" />
+    <display x="15" y="-150" />
+    <inputs>
+      <input type="text" name="Database" friendlyname="Database" narrative="Optional. The path to the oledb database file" expr="" />
+      <input type="password" name="Password" friendlyname="Password" narrative="Optional. The password if required to open the oledb database." expr="" />
+      <input type="text" name="Provider" friendlyname="Provider" narrative="Optional. Allows the database provider to be overridden." expr="" />
+      <input type="text" name="Connection String" friendlyname="Connection String" narrative="Optional. Allows the full connection string to be provided. If supplying this parameter no other parameters are required." expr="&quot;Provider=Microsoft.ACE.OLEDB.12.0;Data Source='D:\RnD\SampleFiles\SampleData.xlsx';Extended Properties='Excel 12.0;HDR=YES;'&quot;" />
+    </inputs>
+    <onsuccess>5e9247d7-cbc7-4bce-b4a7-cde9cb44f4a7</onsuccess>
+    <resource object="Data - OLEDB" action="Set Connection" />
+  </stage>
+  <stage stageid="5e9247d7-cbc7-4bce-b4a7-cde9cb44f4a7" name="Data - OLEDB::Open" type="Action">
+    <loginhibit onsuccess="true" />
+    <display x="15" y="-90" />
+    <onsuccess>00ae71f9-ff08-456f-a8a9-bbd3f50a0d54</onsuccess>
+    <resource object="Data - OLEDB" action="Open" />
+  </stage>
+  <stage stageid="00ae71f9-ff08-456f-a8a9-bbd3f50a0d54" name="Data - OLEDB::Get Collection" type="Action">
+    <loginhibit onsuccess="true" />
+    <display x="15" y="-30" />
+    <inputs>
+      <input type="text" name="SQL" friendlyname="SQL" narrative="An SQL query to fetch the data. In most cases this will be a 'select' query." expr="&quot;select  &#xA;e.* &#xA;,d.Department &#xA;,d.Location  &#xA;,p.PayGrade &#xA;from ((`Sheet2$` e &#xA;INNER JOIN `Sheet1$` d ON d.Id = e.DepartmentId) &#xA;INNER JOIN `Sheet3$` p ON p.Id = e.PayGradeId) &#xA;&quot;" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="Results" friendlyname="Results" stage="Results" />
+    </outputs>
+    <onsuccess>b68bc73e-3794-4824-aeeb-42298d1dc98f</onsuccess>
+    <resource object="Data - OLEDB" action="Get Collection" />
+  </stage>
+  <stage stageid="b68bc73e-3794-4824-aeeb-42298d1dc98f" name="Data - OLEDB::Close" type="Action">
+    <loginhibit onsuccess="true" />
+    <display x="15" y="30" />
+    <onsuccess>b3fe9e74-ee66-42b8-88b3-3bc2de265f8d</onsuccess>
+    <resource object="Data - OLEDB" action="Close" />
+  </stage>
+  <stage stageid="6429f88c-a8cf-4b2a-8616-278dc806c18a" name="Results" type="Collection">
+    <display x="90" y="-30" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+</process>
