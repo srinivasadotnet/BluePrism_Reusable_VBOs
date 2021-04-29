@@ -12,3 +12,7 @@ Reusable Components for BluePrism
      * DownloadBlobItem
      * UploadBlobItem
      * DeleteBlobItem
+
+* Oledb Query - Multiple Joins
+  With the help of this process one can understand how to create multiple joins. 
+  Video link can found [here](https://youtu.be/KsoxpXumioM)
