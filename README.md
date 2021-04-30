@@ -16,6 +16,6 @@ Reusable Components for BluePrism
 * Oledb Query - Multiple Joins
   With the help of this process one can understand how to create multiple joins. 
   Video link can be found [here](https://youtu.be/KsoxpXumioM)
-* SQL Bulk Update
+* SQL Bulk Update -
   Read bulk data from excel using oledb and insert them to Sql Server using SqlBulkInsert class.
   Video link can be found [here](https://youtu.be/rF2fw42LWl8)
