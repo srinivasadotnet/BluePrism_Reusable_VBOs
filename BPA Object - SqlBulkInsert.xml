@@ -1,0 +1,232 @@
+﻿<process name="SqlBulkInsert" version="1.0" bpversion="6.7.3.27155" narrative="" byrefcollection="true" type="object" runmode="Exclusive" preferredid="d1a09fc6-abc2-4a39-91cf-d52605289450">
+  <appdef>
+    <element name="Application Root">
+      <id>0b3e92ad-d19f-4ff4-ab34-1707edc590da</id>
+      <type>Application</type>
+      <basetype>Application</basetype>
+      <datatype>unknown</datatype>
+      <diagnose>False</diagnose>
+    </element>
+  </appdef>
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <subsheet subsheetid="5f04dbcd-0faf-40db-affd-9f3944e01427" type="CleanUp" published="True">
+    <name>Clean Up</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="9e3d5d14-e8f9-428b-a3ed-3c642135fc1b" type="Normal" published="True">
+    <name>Bulk Insert</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="b69e61c1-7320-4d43-be06-8a371c1b828e" name="Start" type="Start">
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>66100974-7350-4f01-afb1-ddb434c43ee4</onsuccess>
+  </stage>
+  <stage stageid="66100974-7350-4f01-afb1-ddb434c43ee4" name="End" type="End">
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="6cb6c95c-10ab-470c-9982-cbd24f1f8605" name="Stage1" type="ProcessInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+    <references>
+      <reference>System.dll</reference>
+      <reference>System.Data.dll</reference>
+      <reference>System.Xml.dll</reference>
+      <reference>System.Drawing.dll</reference>
+      <reference>System.Data.SqlClient.dll</reference>
+    </references>
+    <imports>
+      <import>System</import>
+      <import>System.Drawing</import>
+      <import>System.Data</import>
+      <import>System.Data.SqlClient</import>
+      <import>System.Data.OleDb</import>
+    </imports>
+    <language>csharp</language>
+    <globalcode><![CDATA[]]></globalcode>
+    <code><![CDATA[]]></code>
+  </stage>
+  <stage stageid="308a0a9a-6062-4713-bba5-b67201424c7e" name="Clean Up" type="SubSheetInfo">
+    <subsheetid>5f04dbcd-0faf-40db-affd-9f3944e01427</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="4f32060a-4f56-433a-af39-8a1b86f70b8e" name="Start" type="Start">
+    <subsheetid>5f04dbcd-0faf-40db-affd-9f3944e01427</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>812ee5d9-8a20-46b7-8dbf-75cfa216b85e</onsuccess>
+  </stage>
+  <stage stageid="812ee5d9-8a20-46b7-8dbf-75cfa216b85e" name="End" type="End">
+    <subsheetid>5f04dbcd-0faf-40db-affd-9f3944e01427</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="30ac33cf-477d-4877-b036-d8b9f5f976a5" name="Bulk Insert" type="SubSheetInfo">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="4751a4d0-ca29-4f59-a63f-735820718fe2" name="Start" type="Start">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <loginhibit />
+    <display x="15" y="-135" />
+    <onsuccess>aa4879ef-7413-491d-a294-316747183eb0</onsuccess>
+  </stage>
+  <stage stageid="3d682911-aeaf-4822-82ed-cafe7b783eca" name="End" type="End">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <loginhibit />
+    <display x="15" y="75" />
+  </stage>
+  <stage stageid="9e760f29-dc56-40dd-836d-3d7577a9777f" name="Note1" type="Note">
+    <subsheetid>5f04dbcd-0faf-40db-affd-9f3944e01427</subsheetid>
+    <narrative>Clean Up Page
+
+This is an optional page where you might choose to perform some finalisation (or "cleanup") tasks as your business object is closed down.
+
+The cleanup action will be called automatically immediately after closing your business object at the end of a business process.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than before the disposal of the business object.</narrative>
+    <display x="-180" y="60" w="180" h="230" />
+  </stage>
+  <stage stageid="437bca32-9a26-4f57-a176-e35efe2e2956" name="Note2" type="Note">
+    <narrative>Initialise Page
+
+This is an optional page where you might choose to perform some initialisation tasks after your business object is loaded.
+
+The initialise action will be called automatically immediately after loading your business object.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than after the creation of the object.</narrative>
+    <display x="-180" y="60" w="180" h="230" />
+  </stage>
+  <stage stageid="aa4879ef-7413-491d-a294-316747183eb0" name="Insert To SQL Server" type="Code">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <loginhibit />
+    <display x="15" y="-30" />
+    <inputs>
+      <input type="text" name="ExcelConnectionString" expr="[ExcelConnection]" />
+      <input type="text" name="SqlConnectionString" expr="[SqlConnection]" />
+      <input type="text" name="TableName" expr="[Table Name]" />
+      <input type="text" name="SqlCommand" expr="[SqlCommand]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="StatusLog" stage="StatusLog" />
+    </outputs>
+    <onsuccess>3d682911-aeaf-4822-82ed-cafe7b783eca</onsuccess>
+    <code><![CDATA[DataTable oTbl = null;
+StatusLog = "Execution Started";
+using (OleDbConnection oConn = new OleDbConnection(ExcelConnectionString))
+{
+	try
+	{
+		oConn.Open();
+		StatusLog += "\nConnection Opened";
+		
+		using(OleDbCommand oComm = new OleDbCommand(SqlCommand, oConn))
+		{
+			StatusLog += "\nExecution Started";
+			using(OleDbDataReader oRdr = oComm.ExecuteReader())
+			{
+				oTbl = new DataTable();
+				oTbl.Load(oRdr);
+			}
+		}
+		StatusLog += string.Format("\nData Loaded to Collection : Total Records {0}", oTbl.Rows.Count);
+	}
+	catch (Exception ex)
+	{
+		StatusLog += "\nException : "+ex.Message;
+	}
+	finally
+	{
+		if (oTbl != null) oTbl.Dispose();
+		oConn.Close();
+		StatusLog += "\nConnection Closed";
+	}
+}
+
+if (oTbl != null && oTbl.Rows.Count > 0)
+{
+	StatusLog += "\nSQL Execution Started";
+    
+	using (SqlConnection con = new SqlConnection(SqlConnectionString))
+    {
+        try
+        {
+            con.Open();
+			StatusLog += "\nSQL Connection Opened";
+            using (SqlBulkCopy sqlBulkCopy = new SqlBulkCopy(con))
+            {
+                //Set the database table name
+                sqlBulkCopy.DestinationTableName = TableName;
+				
+				StatusLog += "\nSQL Insertion Started";
+                sqlBulkCopy.WriteToServer(oTbl);
+				StatusLog += "\nSQL Insertion Completed";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusLog += "\nSQL Exception : "+ex.Message;
+        }
+        finally
+        {
+            con.Close();
+			StatusLog += "\nSQL Connection Closed";
+        }
+    }
+}]]></code>
+  </stage>
+  <stage stageid="4ad62a74-0e52-4500-9053-f7b7889b2abd" name="Table Name" type="Data">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <display x="-165" y="45" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">[dbo].[data-large]</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="bf80e010-824e-4e5b-8b34-b9bb25a83e7a" name="ExcelConnection" type="Data">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <display x="-240" y="45" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\RnD\SampleFiles\data-large.xlsx;Extended Properties='Excel 12.0 Xml;HDR=YES;'</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="bcc86630-25fe-466f-b33c-688edfe77f50" name="SqlConnection" type="Data">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <display x="-240" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=SampleDb;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="6714d7b2-d63d-4c1c-9906-15e9f09cc3f5" name="StatusLog" type="Data">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <display x="180" y="-30" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="e4380eba-f1a8-4f5c-9cb5-036e3919976d" name="SqlCommand" type="Data">
+    <subsheetid>9e3d5d14-e8f9-428b-a3ed-3c642135fc1b</subsheetid>
+    <display x="-165" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">SELECT * FROM [Sheet1$]</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+</process>
