@@ -22,3 +22,5 @@ Reusable Components for BluePrism
 * BPA Object - Extract Password Zip
   Extract password proted zip file using Blue Prism code stage. 
   We have used thrid party open source library named [DotNetZip.dll](https://github.com/haf/DotNetZip.Semverd). Library can be downloaded from gitrepo or nuget, for your usability have added it in [ExampleFile](/ExampleFile) folder. Demo Video can be found [here](https://youtu.be/cSxYyS8EmdE)
+* BPA Object - Table Scrapper.bpobject
+  Scrape data from HTML table and select required columns using code stage LINQ.
