@@ -28,4 +28,4 @@ Reusable Components for BluePrism
 ## BPA Object - Utility-SQLite Helper.bpobject
   SQLite helper object to perform CRUD operations on SQLite database.
   </br>Demo Video can be found [here](https://youtu.be/vV2SCVXAcqE)
-  </br>SQLite libraries can be found [here](/ExampleFile/SQLite-libs)
+  </br>SQLite libraries can be found [here](/ExampleFile/SQLite%20libs)
