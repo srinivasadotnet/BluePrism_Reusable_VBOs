@@ -1,0 +1,487 @@
+﻿<process name="Utility-SQLite Helper" version="1.0" bpversion="7.0.0.40580" narrative="Utility SQLite Helper" byrefcollection="true" type="object" runmode="Exclusive" preferredid="73965746-9a5b-425f-b34b-7d2028a51edd">
+  <appdef>
+    <element name="Application Root">
+      <id>22fd5a2d-4250-4baa-92e8-7ab2c631fca8</id>
+      <type>Application</type>
+      <datatype>unknown</datatype>
+      <diagnose>False</diagnose>
+    </element>
+  </appdef>
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <subsheet subsheetid="9284a298-100c-4518-9ec9-f2a02288cca5" type="CleanUp" published="True">
+    <name>Clean Up</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="55f4c74e-3ce1-41e6-a430-c0007e6d9744" type="Normal" published="True">
+    <name>Create Table</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="bd91f418-c204-49a0-af24-323b57741d60" type="Normal" published="True">
+    <name>Execute Query With Result</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>-63</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="3fbfbb31-29b3-495a-ac78-eec11238b898" type="Normal" published="True">
+    <name>Execute Query Without Result</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="d679b5da-d91b-4a16-ac9d-2ea21ea4a86c" name="Start" type="Start">
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>ae10f223-2cde-4e12-a0f0-c232e7d8a4a2</onsuccess>
+  </stage>
+  <stage stageid="ae10f223-2cde-4e12-a0f0-c232e7d8a4a2" name="End" type="End">
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="63a5be09-c440-4b09-a239-27dc43782643" name="Stage1" type="ProcessInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+    <references>
+      <reference>System.dll</reference>
+      <reference>System.Data.dll</reference>
+      <reference>System.Xml.dll</reference>
+      <reference>System.Drawing.dll</reference>
+      <reference>System.Data.SQLite.dll</reference>
+    </references>
+    <imports>
+      <import>System</import>
+      <import>System.Drawing</import>
+      <import>System.Data</import>
+      <import>System.Data.SQLite</import>
+    </imports>
+    <language>csharp</language>
+    <globalcode><![CDATA[]]></globalcode>
+    <code><![CDATA[]]></code>
+  </stage>
+  <stage stageid="50583bc7-8c8f-452f-87eb-305f3783c644" name="Clean Up" type="SubSheetInfo">
+    <subsheetid>9284a298-100c-4518-9ec9-f2a02288cca5</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="2f36813b-c208-4c9b-a597-b1e1dfd425f7" name="Start" type="Start">
+    <subsheetid>9284a298-100c-4518-9ec9-f2a02288cca5</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>54032f4b-fdd9-4cfc-bb24-9ce64dc10073</onsuccess>
+  </stage>
+  <stage stageid="54032f4b-fdd9-4cfc-bb24-9ce64dc10073" name="End" type="End">
+    <subsheetid>9284a298-100c-4518-9ec9-f2a02288cca5</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="b35fcc2f-c533-4c93-9104-a484a6c1259b" name="Create Table" type="SubSheetInfo">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="47ae85b9-9d49-4e1a-8f6e-7de1d0109bc3" name="Start" type="Start">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <inputs>
+      <input type="text" name="TableName" narrative="Table Name" stage="TableName" />
+      <input type="text" name="CreateTableQuery" narrative="Create Table Query" stage="CreateTableQuery" />
+      <input type="text" name="Connection" narrative="Connection" stage="Connection" />
+    </inputs>
+    <onsuccess>0de42ee7-2aba-4564-a250-5114798a77de</onsuccess>
+  </stage>
+  <stage stageid="91a95fc8-ee04-4d62-9043-e321fd2548fd" name="End" type="End">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="4f43ae58-aa37-48f7-bcaf-f0e129caa12a" name="" type="Note">
+    <subsheetid>9284a298-100c-4518-9ec9-f2a02288cca5</subsheetid>
+    <narrative>Clean Up Page
+
+This is an optional page where you might choose to perform some finalisation (or "cleanup") tasks as your business object is closed down.
+
+The cleanup action will be called automatically immediately after closing your business object at the end of a business process.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than before the disposal of the business object.</narrative>
+    <display x="-180" y="60" w="180" h="230" />
+  </stage>
+  <stage stageid="94e412ea-9f55-4452-9f14-c768caf07ef2" name="" type="Note">
+    <narrative>Initialise Page
+
+This is an optional page where you might choose to perform some initialisation tasks after your business object is loaded.
+
+The initialise action will be called automatically immediately after loading your business object.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than after the creation of the object.</narrative>
+    <display x="-180" y="60" w="180" h="230" />
+  </stage>
+  <stage stageid="3229fa88-50fd-4d08-b5a4-bdec335ab7fd" name="Execute Query With Result" type="SubSheetInfo">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="ed182e82-0dfa-4ac5-86ee-e513722e19ec" name="Start" type="Start">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <inputs>
+      <input type="text" name="Connection" narrative="Connection" stage="Connection" />
+      <input type="text" name="Query" narrative="Query" stage="Query" />
+    </inputs>
+    <onsuccess>b70d7e2b-fdd6-464e-9b80-3c26b5d44fd2</onsuccess>
+  </stage>
+  <stage stageid="16ccbd29-82e9-4558-93a6-3e3669846d67" name="End" type="End">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+    <outputs>
+      <output type="collection" name="ResultCollection" narrative="Result Collection" stage="ResultCollection" />
+    </outputs>
+  </stage>
+  <stage stageid="a8e53c36-845e-4084-b677-21d3413449f4" name="Execute Query Without Result" type="SubSheetInfo">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="5d3be3d3-fff9-44c6-a3f2-b2559907d93e" name="Start" type="Start">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <inputs>
+      <input type="text" name="Connection" narrative="Connection" stage="Connection" />
+      <input type="text" name="Query" narrative="Query" stage="Query" />
+    </inputs>
+    <onsuccess>f5d28cb7-da9f-4a23-a6f8-ee00a923a101</onsuccess>
+  </stage>
+  <stage stageid="6908f192-2f50-44a7-92b5-259241debcba" name="End" type="End">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="0de42ee7-2aba-4564-a250-5114798a77de" name="Create Table" type="Code">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="Connection" expr="[Connection]" />
+      <input type="text" name="TableName" expr="[TableName]" />
+      <input type="text" name="CreateTableQuery" expr="[CreateTableQuery]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Result" stage="Result" />
+    </outputs>
+    <onsuccess>91a95fc8-ee04-4d62-9043-e321fd2548fd</onsuccess>
+    <code><![CDATA[Result = string.Empty;
+
+// Validate Connection string provided.
+if(string.IsNullOrWhiteSpace(Connection))
+{
+	Result = "Connection Required";
+	return;
+}
+
+// Validate TableName provided.
+if(string.IsNullOrWhiteSpace(TableName))
+{
+	Result = "TableName Required";
+	return;
+}
+
+// Validate Create Table Query provided.
+if(string.IsNullOrWhiteSpace(CreateTableQuery))
+{
+	Result = "Connection Required";
+	return;
+}
+
+// Metadata table to verify whether table exist or not. 
+string metadataTable = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = @TableName;";
+
+// boolean variable to store table exist or not.
+var isTableExists = false;
+
+// Create connection object from given input connection.
+using(SQLiteConnection connection = new SQLiteConnection(Connection))
+{
+	try
+	{
+		// Try to open the connection if something wrong it will throw exception.
+		connection.Open();
+		
+		// Create command from connection.
+		using (SQLiteCommand command = connection.CreateCommand())
+        {
+			// Pass metadata table query.
+            command.CommandText = metadataTable;
+			command.Parameters.Add(new SQLiteParameter("@TableName", TableName));
+            
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    isTableExists = TableName.Equals(reader["name"].ToString());
+                }
+            }
+
+            if (!isTableExists)
+            {
+                command.CommandText = CreateTableQuery;
+                command.ExecuteNonQuery();
+            }
+        }
+		Result = "Success";
+	}
+	catch(Exception e)
+	{
+		Result = e.Message;
+	}
+	finally
+	{
+		connection.Close();
+	}
+}]]></code>
+  </stage>
+  <stage stageid="8ca7df4a-e7cb-4fe3-b161-6c977e2b1dff" name="Connection" type="Data">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <display x="-195" y="30" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="23556896-b3eb-498a-af06-686349b7238a" name="TableName" type="Data">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <display x="-195" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="6712e2de-f1fb-4277-ab23-e45f91545e83" name="Result" type="Data">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <display x="210" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="b447a3ca-d16b-4555-87c6-a78c659ccd83" name="CreateTableQuery" type="Data">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <display x="-195" y="75" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="5e6042bc-b95c-4b47-9214-f84b27237fed" name="Inputs" type="Block">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <loginhibit />
+    <display x="-255" y="-45" w="120" h="150" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="aa8b6edc-2be1-42e1-8237-e868f9c50809" name="Result" type="Block">
+    <subsheetid>55f4c74e-3ce1-41e6-a430-c0007e6d9744</subsheetid>
+    <loginhibit />
+    <display x="150" y="-45" w="120" h="75" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="b70d7e2b-fdd6-464e-9b80-3c26b5d44fd2" name="Execute Query" type="Code">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="Connection" expr="[Connection]" />
+      <input type="text" name="Query" expr="[Query]" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="ResultCollection" stage="ResultCollection" />
+      <output type="text" name="Message" stage="Message" />
+    </outputs>
+    <onsuccess>16ccbd29-82e9-4558-93a6-3e3669846d67</onsuccess>
+    <code><![CDATA[ResultCollection = new DataTable();
+
+// Validate Connection string provided.
+if(string.IsNullOrWhiteSpace(Connection))
+{
+	Message = "Connection Required";
+	return;
+}
+
+// Validate Query.
+if(string.IsNullOrWhiteSpace(Query))
+{
+	Message = "Query Required";
+	return;
+}
+
+// Create connection object from given input connection.
+using(SQLiteConnection connection = new SQLiteConnection(Connection))
+{
+	try
+	{
+		// Try to open the connection if something wrong it will throw exception.
+		connection.Open();
+		
+		var adaptor = new SQLiteDataAdapter(Query, connection);
+		adaptor.Fill(ResultCollection);
+		Message = "Success";
+	}
+	catch(Exception e)
+	{
+		Message = e.Message;
+	}
+	finally
+	{
+		connection.Close();
+	}
+}]]></code>
+  </stage>
+  <stage stageid="39b5a782-6963-4412-85e4-c6f09c2af28d" name="Connection" type="Data">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <display x="-195" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="0e7478af-3cde-4a9d-80b2-905cf84186f4" name="Query" type="Data">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <display x="-195" y="30" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="5ff7f54d-e83b-480c-9446-9b030deb84d2" name="ResultCollection" type="Collection">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <display x="225" y="-45" w="90" h="60" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="cbf74b7d-cf0b-4108-9edd-7502e449dba7" name="Inputs" type="Block">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <loginhibit />
+    <display x="-255" y="-45" w="120" h="105" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="a7658eee-a6da-4241-a154-603f386d0089" name="output" type="Block">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <loginhibit />
+    <display x="165" y="-90" w="120" h="135" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="ab9c0b9f-b3e4-43e6-90fb-a519268bcb0d" name="Message" type="Data">
+    <subsheetid>bd91f418-c204-49a0-af24-323b57741d60</subsheetid>
+    <display x="225" y="15" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="f5d28cb7-da9f-4a23-a6f8-ee00a923a101" name="Execute Non Query" type="Code">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="Connection" expr="[Connection]" />
+      <input type="text" name="Query" expr="[Query]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Message" stage="Message" />
+    </outputs>
+    <onsuccess>6908f192-2f50-44a7-92b5-259241debcba</onsuccess>
+    <code><![CDATA[Message = string.Empty;
+
+// Validate Connection string provided.
+if(string.IsNullOrWhiteSpace(Connection))
+{
+	Message = "Connection Required";
+	return;
+}
+
+// Validate Query.
+if(string.IsNullOrWhiteSpace(Query))
+{
+	Message = "Query Required";
+	return;
+}
+
+// Create connection object from given input connection.
+using(SQLiteConnection connection = new SQLiteConnection(Connection))
+{
+	try
+	{
+		// Try to open the connection if something wrong it will throw exception.
+		connection.Open();
+		
+		// Create command from connection.
+		using (SQLiteCommand command = connection.CreateCommand())
+        {
+			// Pass metadata table query.
+            command.CommandText = Query;
+            command.ExecuteNonQuery();
+        }
+		
+		Message = "Success";
+	}
+	catch(Exception e)
+	{
+		Message = e.Message;
+	}
+	finally
+	{
+		connection.Close();
+	}
+}]]></code>
+  </stage>
+  <stage stageid="563583d0-bea2-4b9f-b8ce-7633f84de70d" name="Connection" type="Data">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <display x="-195" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="cdf3f76b-8cdb-4478-9c64-790de43d283b" name="Query" type="Data">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <display x="-195" y="30" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="88c5f2ff-7ac7-4619-b1f9-4d23f3673899" name="Message" type="Data">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <display x="165" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="2ab0c226-41dd-4d9e-81c2-c8febab006b6" name="Block1" type="Block">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <loginhibit />
+    <display x="-240" y="-45" w="105" h="105" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="d7218faa-b172-42a0-a904-f377fcb091d7" name="Result" type="Block">
+    <subsheetid>3fbfbb31-29b3-495a-ac78-eec11238b898</subsheetid>
+    <loginhibit />
+    <display x="120" y="-45" w="90" h="60" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+</process>
