@@ -1,0 +1,403 @@
+﻿<process name="Utility - Oledb Excel Writer" version="1.0" bpversion="7.0.0.40580" narrative="Write Collection data to Excel using Oledb" byrefcollection="true" type="object" runmode="Exclusive" preferredid="8f0ec088-83b0-4ef9-a03f-86ba8966a096">
+  <appdef>
+    <element name="Application Root">
+      <id>7f241ff3-492a-4faa-a5d4-1a5f080655cb</id>
+      <type>Application</type>
+      <datatype>unknown</datatype>
+      <diagnose>False</diagnose>
+    </element>
+  </appdef>
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <subsheet subsheetid="d441e13f-364d-424b-ae95-6738a9582678" type="CleanUp" published="True">
+    <name>Clean Up</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="690468eb-a63e-4992-8c8d-0ef27661b702" type="Normal" published="False">
+    <name>Collection To Excel</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="d2ee9501-fc97-441e-a7b4-006609123b05" name="Start" type="Start">
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>f1eadd45-6a98-4a78-99a2-4f637e00a2fd</onsuccess>
+  </stage>
+  <stage stageid="f1eadd45-6a98-4a78-99a2-4f637e00a2fd" name="End" type="End">
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="354b5d18-5f06-44c8-96e7-059564129d5b" name="Stage1" type="ProcessInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+    <references>
+      <reference>System.dll</reference>
+      <reference>System.Data.dll</reference>
+      <reference>System.Xml.dll</reference>
+      <reference>System.Drawing.dll</reference>
+    </references>
+    <imports>
+      <import>System</import>
+      <import>System.Drawing</import>
+      <import>System.Data</import>
+      <import>System.Collections.Generic</import>
+      <import>System.IO</import>
+      <import>System.Data.OleDb</import>
+      <import>System.Text</import>
+    </imports>
+    <language>csharp</language>
+    <globalcode><![CDATA[]]></globalcode>
+    <code><![CDATA[// Structures used for conversion between data-types.
+private struct ExcelDataTypes
+{
+    public const string NUMBER = "NUMBER";
+    public const string DATETIME = "DATETIME";
+    public const string TEXT = "TEXT"; // also works with "STRING".
+}
+
+private struct NETDataTypes
+{
+    public const string SHORT = "int16";
+    public const string INT = "int32";
+    public const string LONG = "int64";
+    public const string STRING = "string";
+    public const string DATE = "DateTime";
+    public const string BOOL = "Boolean";
+    public const string DECIMAL = "decimal";
+    public const string DOUBLE = "double";
+    public const string FLOAT = "float";
+}
+
+/// <summary>
+/// Routine to export a given DataSet to Excel. For each DataTable contained 
+/// in the DataSet the overloaded routine will create a new Excel sheet based 
+/// upon the currently selected DataTable. The proceedure loops through all 
+/// DataRows in the selected DataTable and pushes each one to the specified 
+/// Excel file using ADO.NET and the Access Database Engine (Excel is not a 
+/// prerequisit).
+/// </summary>
+/// <param name="dataTable">The DataTable to be written to Excel.</param>
+/// <param name="connectionString">The connection string.</param>
+/// <param name="fileName">The Excel file name to export to.</param>
+/// <param name="deleteExistFile">Delete existing file?</param>
+public static void ExportToExcelOleDb(DataTable dataTable, string connectionString, string fileName, bool deleteExistFile)
+{
+    // Support for existing file overwrite.
+    if (deleteExistFile && File.Exists(fileName))
+        File.Delete(fileName);
+    ExportToExcelOleDb(dataTable, connectionString, fileName);
+}
+
+/// <summary>
+/// Overloaded version of the above.
+/// </summary>
+/// <param name="dataSet">The DataSet to be written to Excel.</param>
+/// <param name="connectionString">The SqlConnection string.</param>
+/// <param name="fileName">The Excel file name to export to.</param>
+public static bool ExportToExcelOleDb(DataTable dataTable, string connectionString, string fileName)
+{
+    try
+    {
+        // Check for null set.
+        if (dataTable != null && dataTable.Rows.Count > 0)
+        {
+            using (OleDbConnection connection = new OleDbConnection(String.Format(connectionString, fileName)))
+            {
+                // Initialise SqlCommand and open.
+                OleDbCommand command = null;
+                connection.Open();
+
+                // Build the Excel create table command.
+                string strCreateTableStruct = BuildCreateTableCommand(dataTable);
+                if (String.IsNullOrEmpty(strCreateTableStruct))
+                    return false;
+
+                command = new OleDbCommand(strCreateTableStruct, connection);
+                command.ExecuteNonQuery();
+
+                // Puch each row into Excel.
+                for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
+                {
+                    command = new OleDbCommand(BuildInsertCommand(dataTable, rowIndex), connection);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+        return true;
+    }
+    catch (Exception eX)
+    {
+        return false;
+    }
+}
+
+/// <summary>
+/// Build the various sheet names to be inserted based upon the 
+/// number of DataTable provided in the DataSet. This is not required
+/// for XCost purposes. Coded for completion.
+/// </summary>
+/// <param name="connectionString">The connection string.</param>
+/// <returns>String array of sheet names.</returns>
+private static string[] BuildExcelSheetNames(string connectionString)
+{
+    // Variables.
+    DataTable dt = null;
+    string[] excelSheets = null;
+
+    using (OleDbConnection schemaConn = new OleDbConnection(connectionString))
+    {
+        schemaConn.Open();
+        dt = schemaConn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+
+        // No schema found.
+        if (dt == null)
+            return null;
+
+        // Insert 'TABLE_NAME' to sheet name array.
+        int i = 0;
+        excelSheets = new string[dt.Rows.Count];
+        foreach (DataRow row in dt.Rows)
+            excelSheets[i++] = row["TABLE_NAME"].ToString();
+    }
+    return excelSheets;
+}
+
+/// <summary>
+/// Routine to build the CREATE TABLE command. The conversion of 
+/// .NET to Excel data types is also handled here (supposedly!). 
+/// Help: http://support.microsoft.com/kb/316934/en-us.
+/// </summary>
+/// <param name="dataTable"></param>
+/// <returns>The CREATE TABLE command string.</returns>
+private static string BuildCreateTableCommand(DataTable dataTable)
+{
+    // Get the type look-up tables.
+    StringBuilder sb = new StringBuilder();
+    Dictionary<string, string> dataTypeList = BuildExcelDataTypes();
+
+    // Check for null data set.
+    if (dataTable.Columns.Count <= 0)
+        return null;
+
+    // Start the command build.
+    sb.AppendFormat("CREATE TABLE [{0}] (", BuildExcelSheetName(dataTable));
+
+    // Build column names and types.
+    foreach (DataColumn col in dataTable.Columns)
+    {
+        string type = ExcelDataTypes.TEXT;
+        if (dataTypeList.ContainsKey(col.DataType.Name.ToString().ToLower()))
+        {
+            type = dataTypeList[col.DataType.Name.ToString().ToLower()];
+        }
+        sb.AppendFormat("[{0}] {1},", col.Caption.Replace(' ', '_'), type);
+    }
+    sb = sb.Replace(',', ')', sb.ToString().LastIndexOf(','), 1);
+    return sb.ToString();
+}
+
+/// <summary>
+/// Routine to construct the INSERT INTO command. This does not currently 
+/// work with the data type miss matches.
+/// </summary>
+/// <param name="dataTable"></param>
+/// <param name="rowIndex"></param>
+/// <returns></returns>
+private static string BuildInsertCommand(DataTable dataTable, int rowIndex)
+{
+    StringBuilder sb = new StringBuilder();
+
+    // Remove whitespace.
+    sb.AppendFormat("INSERT INTO [{0}$] ", BuildExcelSheetName(dataTable));
+
+    // Write values.
+    sb.Append(" VALUES (");
+    foreach (DataColumn col in dataTable.Columns)
+    {
+        string type = col.DataType.ToString();
+        string strToInsert = String.Empty;
+        strToInsert = dataTable.Rows[rowIndex][col].ToString().Replace("'", "''");
+        sb.AppendFormat("'{0}',", strToInsert);
+    }
+
+    sb = sb.Replace(',', ')', sb.ToString().LastIndexOf(','), 1);
+    return sb.ToString();
+}
+
+/// <summary>
+/// Build the Excel sheet name.
+/// </summary>
+/// <param name="dataTable"></param>
+/// <returns></returns>
+private static string BuildExcelSheetName(DataTable dataTable)
+{
+    string retVal = dataTable.TableName;
+    //if (dataTable.ExtendedProperties.ContainsKey(TABLE_NAME_PROPERTY))
+    //    retVal = dataTable.ExtendedProperties[TABLE_NAME_PROPERTY].ToString();
+    return retVal.Replace(' ', '_');
+}
+
+/// <summary>
+/// Dictionary for conversion between .NET data types and Excel 
+/// data types. The conversion does not currently work, so I am 
+/// pushing all data upto excel as Excel "TEXT" type.
+/// </summary>
+/// <returns></returns>
+private static Dictionary<string, string> BuildExcelDataTypes()
+{
+    Dictionary<string, string> dataTypeLookUp = new Dictionary<string, string>();
+
+    // I cannot get the Excel formatting correct here!?
+    dataTypeLookUp.Add(NETDataTypes.SHORT, ExcelDataTypes.NUMBER);
+    dataTypeLookUp.Add(NETDataTypes.INT, ExcelDataTypes.NUMBER);
+    dataTypeLookUp.Add(NETDataTypes.LONG, ExcelDataTypes.NUMBER);
+    dataTypeLookUp.Add(NETDataTypes.STRING, ExcelDataTypes.TEXT);
+    dataTypeLookUp.Add(NETDataTypes.DATE, ExcelDataTypes.DATETIME);
+    dataTypeLookUp.Add(NETDataTypes.BOOL, ExcelDataTypes.TEXT);
+    dataTypeLookUp.Add(NETDataTypes.DECIMAL, ExcelDataTypes.NUMBER);
+    dataTypeLookUp.Add(NETDataTypes.DOUBLE, ExcelDataTypes.NUMBER);
+    dataTypeLookUp.Add(NETDataTypes.FLOAT, ExcelDataTypes.NUMBER);
+    return dataTypeLookUp;
+}]]></code>
+  </stage>
+  <stage stageid="2e249ddf-4894-45d7-9b06-77cc9220ec1f" name="Clean Up" type="SubSheetInfo">
+    <subsheetid>d441e13f-364d-424b-ae95-6738a9582678</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="eacfa910-3347-4f61-b670-7a862373eed8" name="Start" type="Start">
+    <subsheetid>d441e13f-364d-424b-ae95-6738a9582678</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <onsuccess>d062dca0-51d4-42f0-81c8-da3a60ef81bd</onsuccess>
+  </stage>
+  <stage stageid="d062dca0-51d4-42f0-81c8-da3a60ef81bd" name="End" type="End">
+    <subsheetid>d441e13f-364d-424b-ae95-6738a9582678</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="e3b857fa-7892-496a-b461-ffaf314ad0b1" name="Collection To Excel" type="SubSheetInfo">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="66301327-27fe-40b8-93d5-3084c634e33b" name="Start" type="Start">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <inputs>
+      <input type="collection" name="InputCollection" narrative="Input Collection to be exported to excel" stage="Input Collection" />
+      <input type="text" name="Destinatio Excel Path" narrative="File path and name of the excel to be saved" stage="Destination Excel Path" />
+    </inputs>
+    <onsuccess>941f4779-b65b-4c66-815f-4c580f04adb9</onsuccess>
+  </stage>
+  <stage stageid="95cb8572-dc35-4627-8c1b-724c7a4ee08e" name="End" type="End">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="a1e61c55-d2c2-45a0-947c-c7638dcf4c1c" name="" type="Note">
+    <subsheetid>d441e13f-364d-424b-ae95-6738a9582678</subsheetid>
+    <narrative>Clean Up Page
+
+This is an optional page where you might choose to perform some finalisation (or "cleanup") tasks as your business object is closed down.
+
+The cleanup action will be called automatically immediately after closing your business object at the end of a business process.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than before the disposal of the business object.</narrative>
+    <display x="-180" y="60" w="180" h="230" />
+  </stage>
+  <stage stageid="a9d361da-c5dd-44ae-8b4c-fb5650a9fbe8" name="" type="Note">
+    <narrative>Initialise Page
+
+This is an optional page where you might choose to perform some initialisation tasks after your business object is loaded.
+
+The initialise action will be called automatically immediately after loading your business object.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than after the creation of the object.</narrative>
+    <display x="-180" y="60" w="180" h="230" />
+  </stage>
+  <stage stageid="941f4779-b65b-4c66-815f-4c580f04adb9" name="Write To Excel" type="Code">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <loginhibit />
+    <display x="15" y="0" />
+    <inputs>
+      <input type="text" name="DestinationExcelPath" expr="[Destination Excel Path]" />
+      <input type="collection" name="InputCollection" expr="[Input Collection]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Message" stage="Message" />
+    </outputs>
+    <onsuccess>95cb8572-dc35-4627-8c1b-724c7a4ee08e</onsuccess>
+    <code><![CDATA[Message = string.Empty;
+
+if(string.IsNullOrWhiteSpace(DestinationExcelPath))
+{
+	Message = "Destination Excel Path Required";
+	return;
+}
+
+if(InputCollection.Rows.Count == 0)
+{
+	Message = "Cannot process Empty Collection";
+	return;
+}
+
+string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml;HDR=NO;IMEX=3;MAXSCANROWS=0'";
+
+try
+{
+	ExportToExcelOleDb(InputCollection, connectionString, DestinationExcelPath, true);
+	Message = "Success";
+}
+catch(Exception ex)
+{
+	Message = ex.Message;
+}
+]]></code>
+  </stage>
+  <stage stageid="0db2ed1a-3972-4170-bba7-18762cef9464" name="Destination Excel Path" type="Data">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <display x="-165" y="45" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="2df7d285-048d-47d7-ba6b-8a677587d546" name="Input Collection" type="Collection">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <display x="-165" y="0" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="6677f65b-535b-456f-94ad-d17577ef64af" name="Message" type="Data">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <display x="165" y="0" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="84584528-6abf-4c05-acd3-d10687212351" name="Inputs" type="Block">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <loginhibit />
+    <display x="-225" y="-30" w="120" h="105" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="53bacc73-d754-4bb5-9f25-453b28caafcb" name="Output" type="Block">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <loginhibit />
+    <display x="105" y="-30" w="120" h="75" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+</process>
