@@ -17,7 +17,7 @@ Reusable Components for BluePrism
   With the help of this process one can understand how to create multiple joins. 
   </br>Video link can be found [here](https://youtu.be/KsoxpXumioM)
 
-## BPA Object - SQL Bulk Update
+## <a>BPA Object - SQL Bulk Update</a>
   Read bulk data from excel using oledb and insert them to Sql Server using SqlBulkInsert class.
   </br>Video link can be found [here](https://youtu.be/rF2fw42LWl8)
 
@@ -38,4 +38,8 @@ Reusable Components for BluePrism
 
 ## <a>BPA Object - Utility - Oledb Excel Writer</a>
 Blue Prism Utility object to write Collection to excel using OleDb.
+</br> Contains 2 actions.
+  * Collection To Excel
 </br> Demo Video can be found [here](https://youtu.be/qju9B61M5kM)
+  * Collection To Existing Excel
+  </br> Demo Video can be found [here](https://youtu.be/21rEPvmIN3A)

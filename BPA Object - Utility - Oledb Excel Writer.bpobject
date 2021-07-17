@@ -3,6 +3,7 @@
     <element name="Application Root">
       <id>7f241ff3-492a-4faa-a5d4-1a5f080655cb</id>
       <type>Application</type>
+      <basetype>Application</basetype>
       <datatype>unknown</datatype>
       <diagnose>False</diagnose>
     </element>
@@ -24,6 +25,14 @@
   </subsheet>
   <subsheet subsheetid="690468eb-a63e-4992-8c8d-0ef27661b702" type="Normal" published="False">
     <name>Collection To Excel</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="59342698-a9aa-4f4f-9e8a-42c1260293fb" type="Normal" published="False">
+    <name>Collection To Existing Excel</name>
     <view>
       <camerax>0</camerax>
       <cameray>0</cameray>
@@ -91,12 +100,12 @@ private struct NETDataTypes
 /// <param name="connectionString">The connection string.</param>
 /// <param name="fileName">The Excel file name to export to.</param>
 /// <param name="deleteExistFile">Delete existing file?</param>
-public static void ExportToExcelOleDb(DataTable dataTable, string connectionString, string fileName, bool deleteExistFile)
+public static void ExportToExcelOleDb(DataTable dataTable, string connectionString, string fileName, bool deleteExistFile, string sheetName = null)
 {
     // Support for existing file overwrite.
     if (deleteExistFile && File.Exists(fileName))
         File.Delete(fileName);
-    ExportToExcelOleDb(dataTable, connectionString, fileName);
+    ExportToExcelOleDb(dataTable, connectionString, fileName, sheetName);
 }
 
 /// <summary>
@@ -105,7 +114,7 @@ public static void ExportToExcelOleDb(DataTable dataTable, string connectionStri
 /// <param name="dataSet">The DataSet to be written to Excel.</param>
 /// <param name="connectionString">The SqlConnection string.</param>
 /// <param name="fileName">The Excel file name to export to.</param>
-public static bool ExportToExcelOleDb(DataTable dataTable, string connectionString, string fileName)
+public static bool ExportToExcelOleDb(DataTable dataTable, string connectionString, string fileName, string sheetName = null, bool isExistingFile = false)
 {
     try
     {
@@ -118,18 +127,22 @@ public static bool ExportToExcelOleDb(DataTable dataTable, string connectionStri
                 OleDbCommand command = null;
                 connection.Open();
 
-                // Build the Excel create table command.
-                string strCreateTableStruct = BuildCreateTableCommand(dataTable);
-                if (String.IsNullOrEmpty(strCreateTableStruct))
-                    return false;
+				// If isExistingFile is false then create table
+				if(isExistingFile == false)
+				{
+					// Build the Excel create table command.
+					string strCreateTableStruct = BuildCreateTableCommand(dataTable, sheetName);
+					if (String.IsNullOrEmpty(strCreateTableStruct))
+						return false;
 
-                command = new OleDbCommand(strCreateTableStruct, connection);
-                command.ExecuteNonQuery();
-
+					command = new OleDbCommand(strCreateTableStruct, connection);
+					command.ExecuteNonQuery();
+				}
+				
                 // Puch each row into Excel.
                 for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
                 {
-                    command = new OleDbCommand(BuildInsertCommand(dataTable, rowIndex), connection);
+                    command = new OleDbCommand(BuildInsertCommand(dataTable, rowIndex, sheetName), connection);
                     command.ExecuteNonQuery();
                 }
             }
@@ -180,7 +193,7 @@ private static string[] BuildExcelSheetNames(string connectionString)
 /// </summary>
 /// <param name="dataTable"></param>
 /// <returns>The CREATE TABLE command string.</returns>
-private static string BuildCreateTableCommand(DataTable dataTable)
+private static string BuildCreateTableCommand(DataTable dataTable, string sheetName)
 {
     // Get the type look-up tables.
     StringBuilder sb = new StringBuilder();
@@ -191,7 +204,7 @@ private static string BuildCreateTableCommand(DataTable dataTable)
         return null;
 
     // Start the command build.
-    sb.AppendFormat("CREATE TABLE [{0}] (", BuildExcelSheetName(dataTable));
+    sb.AppendFormat("CREATE TABLE [{0}] (", string.IsNullOrWhiteSpace(sheetName) ? BuildExcelSheetName(dataTable) : sheetName);
 
     // Build column names and types.
     foreach (DataColumn col in dataTable.Columns)
@@ -214,12 +227,12 @@ private static string BuildCreateTableCommand(DataTable dataTable)
 /// <param name="dataTable"></param>
 /// <param name="rowIndex"></param>
 /// <returns></returns>
-private static string BuildInsertCommand(DataTable dataTable, int rowIndex)
+private static string BuildInsertCommand(DataTable dataTable, int rowIndex, string sheetName)
 {
     StringBuilder sb = new StringBuilder();
 
     // Remove whitespace.
-    sb.AppendFormat("INSERT INTO [{0}$] ", BuildExcelSheetName(dataTable));
+    sb.AppendFormat("INSERT INTO [{0}$] ", string.IsNullOrWhiteSpace(sheetName) ? BuildExcelSheetName(dataTable) : sheetName);
 
     // Write values.
     sb.Append(" VALUES (");
@@ -297,6 +310,7 @@ private static Dictionary<string, string> BuildExcelDataTypes()
     <inputs>
       <input type="collection" name="InputCollection" narrative="Input Collection to be exported to excel" stage="Input Collection" />
       <input type="text" name="Destinatio Excel Path" narrative="File path and name of the excel to be saved" stage="Destination Excel Path" />
+      <input type="text" name="Sheet Name" narrative="Excel Sheet Name to create and insert" stage="Sheet Name" />
     </inputs>
     <onsuccess>941f4779-b65b-4c66-815f-4c580f04adb9</onsuccess>
   </stage>
@@ -333,6 +347,7 @@ You will not be able to call this action from a business process, nor will it be
     <inputs>
       <input type="text" name="DestinationExcelPath" expr="[Destination Excel Path]" />
       <input type="collection" name="InputCollection" expr="[Input Collection]" />
+      <input type="text" name="SheetName" expr="[Sheet Name]" />
     </inputs>
     <outputs>
       <output type="text" name="Message" stage="Message" />
@@ -356,7 +371,7 @@ string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Ext
 
 try
 {
-	ExportToExcelOleDb(InputCollection, connectionString, DestinationExcelPath, true);
+	ExportToExcelOleDb(InputCollection, connectionString, DestinationExcelPath, true, SheetName);
 	Message = "Success";
 }
 catch(Exception ex)
@@ -391,7 +406,7 @@ catch(Exception ex)
   <stage stageid="84584528-6abf-4c05-acd3-d10687212351" name="Inputs" type="Block">
     <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
     <loginhibit />
-    <display x="-225" y="-30" w="120" h="105" />
+    <display x="-225" y="-30" w="120" h="150" />
     <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
   </stage>
   <stage stageid="53bacc73-d754-4bb5-9f25-453b28caafcb" name="Output" type="Block">
@@ -399,5 +414,122 @@ catch(Exception ex)
     <loginhibit />
     <display x="105" y="-30" w="120" h="75" />
     <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="55d1922f-579f-47ae-93d7-a2302e135fb1" name="Collection To Existing Excel" type="SubSheetInfo">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="04c52d43-a655-4477-b32e-13101fdd2188" name="Start" type="Start">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <inputs>
+      <input type="collection" name="InputCollection" narrative="Input Collection to be exported to excel" stage="Input Collection" />
+      <input type="text" name="Destinatio Excel Path" narrative="File path and name of the excel to be saved" stage="Destination Excel Path" />
+      <input type="text" name="Sheet Name" narrative="Excel Sheet Name to insert records" stage="Sheet Name" />
+    </inputs>
+    <onsuccess>8db0bd5e-f3d6-4594-90d6-b5e9f10d0235</onsuccess>
+  </stage>
+  <stage stageid="7a9b6386-0e5b-4e12-bf93-951566112c25" name="End" type="End">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="8db0bd5e-f3d6-4594-90d6-b5e9f10d0235" name="Write To Existing Excel" type="Code">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <loginhibit />
+    <display x="15" y="0" />
+    <inputs>
+      <input type="text" name="DestinationExcelPath" expr="[Destination Excel Path]" />
+      <input type="collection" name="InputCollection" expr="[Input Collection]" />
+      <input type="text" name="SheetName" expr="[Sheet Name]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Message" stage="Message" />
+    </outputs>
+    <onsuccess>7a9b6386-0e5b-4e12-bf93-951566112c25</onsuccess>
+    <code><![CDATA[Message = string.Empty;
+
+if(string.IsNullOrWhiteSpace(DestinationExcelPath))
+{
+	Message = "Destination Excel Path Required";
+	return;
+}
+
+if(InputCollection.Rows.Count == 0)
+{
+	Message = "Cannot process Empty Collection";
+	return;
+}
+
+if(string.IsNullOrWhiteSpace(SheetName))
+{
+	Message = "Sheet Name Required to insert records";
+	return;
+}
+
+string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 12.0 Xml;HDR=YES;IMEX=3;MAXSCANROWS=0'";
+
+try
+{
+	ExportToExcelOleDb(InputCollection, connectionString, DestinationExcelPath, SheetName, true);
+	Message = "Success";
+}
+catch(Exception ex)
+{
+	Message = ex.Message;
+}
+]]></code>
+  </stage>
+  <stage stageid="b07414e5-1434-47ea-b4cd-6a3f1310c6ed" name="Destination Excel Path" type="Data">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <display x="-165" y="45" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="ea1a9d30-0d8a-44d4-bcb8-121cd16e56be" name="Input Collection" type="Collection">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <display x="-165" y="0" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="0580ce32-2471-46a6-a483-9aa0bf24f533" name="Message" type="Data">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <display x="165" y="0" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="c6233ee6-0aab-4792-b45e-df095f7bbe4a" name="Inputs" type="Block">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <loginhibit />
+    <display x="-225" y="-30" w="120" h="150" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="f7ba8b8f-7f56-4dcb-89d8-3ef5e7c7a81a" name="Output" type="Block">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <loginhibit />
+    <display x="105" y="-30" w="120" h="75" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="d89aa4cd-487d-48de-9b26-e7d8703476ab" name="Sheet Name" type="Data">
+    <subsheetid>690468eb-a63e-4992-8c8d-0ef27661b702</subsheetid>
+    <display x="-165" y="90" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="bedc16e5-1079-4fb4-8943-d822d10fe35d" name="Sheet Name" type="Data">
+    <subsheetid>59342698-a9aa-4f4f-9e8a-42c1260293fb</subsheetid>
+    <display x="-165" y="90" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
   </stage>
 </process>
