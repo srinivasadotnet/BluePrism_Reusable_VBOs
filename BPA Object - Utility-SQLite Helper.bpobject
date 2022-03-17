@@ -3,6 +3,7 @@
     <element name="Application Root">
       <id>22fd5a2d-4250-4baa-92e8-7ab2c631fca8</id>
       <type>Application</type>
+      <basetype>Application</basetype>
       <datatype>unknown</datatype>
       <diagnose>False</diagnose>
     </element>
@@ -40,6 +41,14 @@
   </subsheet>
   <subsheet subsheetid="3fbfbb31-29b3-495a-ac78-eec11238b898" type="Normal" published="True">
     <name>Execute Query Without Result</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="5aab596d-c435-4626-a004-bfd660197ccb" type="Normal" published="True">
+    <name>Insert Collection</name>
     <view>
       <camerax>0</camerax>
       <cameray>0</cameray>
@@ -483,5 +492,153 @@ using(SQLiteConnection connection = new SQLiteConnection(Connection))
     <loginhibit />
     <display x="120" y="-45" w="90" h="60" />
     <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="cf40efc2-b1f2-4e8e-99d4-5f5c3cf61d6d" name="Insert Collection" type="SubSheetInfo">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="6ccebaab-1c2a-4735-926a-7b0048f1d880" name="Start" type="Start">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <loginhibit />
+    <display x="15" y="-105" />
+    <inputs>
+      <input type="text" name="Connection" narrative="Connection" stage="Connection" />
+      <input type="collection" name="InputData" narrative="Input Data" stage="InputData" />
+    </inputs>
+    <onsuccess>c6388ff2-5f2a-4a2b-a6ea-a41a0418e78d</onsuccess>
+  </stage>
+  <stage stageid="3f549c0a-9de8-40ba-95ed-8c1a6e989765" name="End" type="End">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <loginhibit />
+    <display x="15" y="90" />
+  </stage>
+  <stage stageid="c6388ff2-5f2a-4a2b-a6ea-a41a0418e78d" name="Insert Query With Collection" type="Code">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <loginhibit />
+    <display x="15" y="-15" />
+    <inputs>
+      <input type="text" name="Connection" expr="[Connection]" />
+      <input type="collection" name="InputCollection" expr="[InputData]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Message" stage="Message" />
+    </outputs>
+    <onsuccess>3f549c0a-9de8-40ba-95ed-8c1a6e989765</onsuccess>
+    <code><![CDATA[Message = string.Empty;
+
+// Validate Connection string provided.
+if(string.IsNullOrWhiteSpace(Connection))
+{
+	Message = "Connection Required";
+	return;
+}
+
+// Validate Collection.
+if(InputCollection == null || InputCollection.Rows.Count <= 0)
+{
+	Message = "Minimum one row is required to insert data";
+	return;
+}
+
+// Create connection object from given input connection.
+using(SQLiteConnection connection = new SQLiteConnection(Connection))
+{
+	try
+	{
+		
+		// Try to open the connection if something wrong it will throw exception.
+		connection.Open();
+		
+		using (SQLiteCommand command = new SQLiteCommand())
+		{
+			command.Connection = connection;
+		
+			// When setting UpdateBatchSize to a value other than 1, all the commands
+			// associated with the SqlDataAdapter have to have their UpdatedRowSource
+			// property set to None or OutputParameters. An exception is thrown otherwise.
+			command.UpdatedRowSource = UpdateRowSource.None;
+		
+			//command.CommandText = "INSERT INTO DemoTable (name, price) VALUES (@name, @price)";
+			command.CommandText = "INSERT INTO DemoTable (name, Age, location) VALUES (@name, @age, @location)";
+		
+			command.Parameters.Add("@name", DbType.String, 2000, "name");
+			command.Parameters.Add("@age", DbType.Int32, 2, "age");
+			command.Parameters.Add("@location", DbType.String, 2000, "location");
+		
+			using (SQLiteDataAdapter adapter = new SQLiteDataAdapter())
+			{
+				adapter.InsertCommand = command;
+				adapter.Update(InputCollection);
+			}
+		}
+		
+		Message = "Success";
+	}
+	catch(Exception e)
+	{
+		Message = "Ex: "+e.Message;
+	}
+	finally
+	{
+		connection.Close();
+	}
+}]]></code>
+  </stage>
+  <stage stageid="2d680c7c-13b4-4cab-a982-4af8aeedce50" name="Connection" type="Data">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <display x="-195" y="0" w="120" h="30" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">Data Source=D:\Database\SQLite_database.db;Version=3;</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="e01003b6-7bc0-4327-8cf1-26403916290b" name="Message" type="Data">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <display x="165" y="-15" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="e7edf52f-263f-43f6-9cb3-e5454df28fd9" name="Inputs" type="Block">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <loginhibit />
+    <display x="-270" y="-45" w="150" h="150" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="269939a1-c330-4962-8d7c-87b186f444f6" name="Result" type="Block">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <loginhibit />
+    <display x="120" y="-45" w="90" h="60" />
+    <font family="Segoe UI" size="10" style="Regular" color="7FB2E5" />
+  </stage>
+  <stage stageid="91c2b34f-ffdf-4af6-924a-3def084b600e" name="InputData" type="Collection">
+    <subsheetid>5aab596d-c435-4626-a004-bfd660197ccb</subsheetid>
+    <display x="-195" y="60" w="120" h="30" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+    <collectioninfo>
+      <field name="name" type="text" />
+      <field name="Age" type="number" />
+      <field name="location" type="text" />
+    </collectioninfo>
+    <initialvalue>
+      <row>
+        <field name="name" type="text" value="Bond" />
+        <field name="Age" type="number" value="30" />
+        <field name="location" type="text" value="INDIA" />
+      </row>
+      <row>
+        <field name="name" type="text" value="Jane" />
+        <field name="Age" type="number" value="40" />
+        <field name="location" type="text" value="USA" />
+      </row>
+      <row>
+        <field name="name" type="text" value="Smith" />
+        <field name="Age" type="number" value="50" />
+        <field name="location" type="text" value="UK" />
+      </row>
+    </initialvalue>
   </stage>
 </process>

@@ -35,6 +35,7 @@ Reusable Components for BluePrism
   SQLite helper object to perform CRUD operations on SQLite database.
   </br>Demo Video can be found [here](https://youtu.be/vV2SCVXAcqE)
   </br>SQLite libraries can be found [here](/ExampleFile/SQLite%20libs)
+  </br>SQLite Insert data from Collection [Video](https://youtu.be/BddBbyk6LVU)
 
 ## <a>BPA Object - Utility - Oledb Excel Writer</a>
 Blue Prism Utility object to write Collection to excel using OleDb.
